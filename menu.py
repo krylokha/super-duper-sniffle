@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Callable, List
 
-class MenuItem:
+class MenuItem(ABC):
     title: str
 
     def __init__(self, title):
@@ -32,20 +32,22 @@ class Menu(MenuItem):
             self.__handle_user_input()
 
     def add_MenuItem(self, item: MenuItem):
-        self.items.push(item) # Исправь позже на аппенд, это питон, а не урок по моветону
+        self.items.append(item) # Исправь позже на аппенд, это питон, а не урок по моветону
 
     def __print_menu(self):
         for item in self.items:
-            print(item.title)
+            print(item.get_title())
 
     def __handle_user_input(self):
         pass
+    # номер пункта меню, не забывать про шибку, если что-то неправильно
 
 class SimpleMenuItem(MenuItem):
     action: Callable
 
-    def __init__(self, title):
+    def __init__(self, title, action):
         super().__init__(title)
+        self.action = action
 
     def run(self):
         self.action()
