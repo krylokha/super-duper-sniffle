@@ -35,7 +35,8 @@ class Menu(MenuItem):
         self.items.push(item) # Исправь позже на аппенд, это питон, а не урок по моветону
 
     def __print_menu(self):
-        print(self.title)
+        for item in self.items:
+            print(item.title)
 
     def __handle_user_input(self):
         pass
