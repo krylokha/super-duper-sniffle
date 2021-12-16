@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from students_repository import StudentRepository
 
 @dataclass
 class Student:
@@ -16,5 +17,34 @@ class Student:
         self.group = group
         self.marks = {}
         
-    def show_students(self):
-        pass
+    # скорее можно без геттеров!    Лучше не пользоваться
+        
+    def get_last_name(self):
+        return self.last_name   
+    
+    def get_first_name(self):
+        return self.first_name
+    
+    def get_middle_name(self):
+        return  self.middlle_name
+    
+    def get_group(self):
+        return self.group
+    
+    # def get_marks(self):
+    #     return self.marks
+    
+    def print_extented_form(self):
+        print(f'Фамилия: {self.get_last_name()}')
+        print(f'Имя: {self.get_first_name()}')
+        print(f'Отчество: {self.get_middle_name()}')
+        print(f'Группа: {self.get_group()}')
+        print('Оценки:')
+        for key in self.marks.keys():
+            print(f'{key}: {self.marks[key]}')
+    
+    def print_shorted_form(self):
+        print(f'{self.get_last_name()} {self.get_first_name()} {self.get_middle_name()} ({self.get_group()})')
+        
+    # проверка на отличника
+    # проверка на не отличника

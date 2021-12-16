@@ -14,8 +14,9 @@ class StudentRepository:
         return self.students[index - 1]
     
     def remove_student(self, index: int):
-        s = self.get_student(index - 1)
-        self.students.remove(s)
+        # s = self.get_student(index - 1)
+        # self.students.remove(s)
+        del self.students[index -]
         
     def count_students(self) -> int:
         return len(self.students)
@@ -25,3 +26,4 @@ class StudentRepository:
     
     def load(self):
         pass
+    

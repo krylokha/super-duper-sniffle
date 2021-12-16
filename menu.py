@@ -45,7 +45,10 @@ class Menu(MenuItem):
     def __print_menu(self):
         for i, item in enumerate(self.items):
             print(f'{i+1}. {item.get_title()}')
-        print(f'{len(self.items) + 1}. Выход')
+        if self.is_main_menu:
+            print(f'{len(self.items) + 1}. Выход')
+        else:
+            print(f'{len(self.items) +1}. Назад') 
 
     def __handle_user_input(self):
         inp = int(input("Выберите пункт меню: "))
@@ -55,10 +58,6 @@ class Menu(MenuItem):
             self.is_running = False
         else:
             self.items[inp - 1].run()
-
-            # for item in self.items:
-            #     if int(item[0]) == inp:
-            #         item.run()
 
 class SimpleMenuItem(MenuItem):
     action: Callable
