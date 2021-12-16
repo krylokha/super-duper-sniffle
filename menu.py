@@ -19,11 +19,12 @@ class Menu(MenuItem):
     items: list[MenuItem]
     is_running: bool
 
-    def __init__(self, title):
+    def __init__(self, title, **kwargs):
         super().__init__(title)
+        is_main_menu = kwargs.get("is_main_menu", True)
         self.items = []
         self.is_running = False
-
+        self.is_main_menu = is_main_menu
 
     def run(self):
         self.is_running = True
@@ -31,16 +32,33 @@ class Menu(MenuItem):
             self.__print_menu()
             self.__handle_user_input()
 
-    def add_MenuItem(self, item: MenuItem):
-        self.items.append(item) # Исправь позже на аппенд, это питон, а не урок по моветону
+    def add_SimpleMenuItem(self, item: MenuItem, action):
+        simple_menu_item = SimpleMenuItem(item, action)
+        self.items.append(simple_menu_item)
+        return simple_menu_item
+        
+    def add_SubMenu(self, title):
+        submenu = Menu(title = title, is_main_menu = False)
+        self.items.append(submenu)
+        return submenu
 
     def __print_menu(self):
-        for item in self.items:
-            print(item.get_title())
+        for i, item in enumerate(self.items):
+            print(f'{i+1}. {item.get_title()}')
+        print(f'{len(self.items) + 1}. Выход')
 
     def __handle_user_input(self):
-        pass
-    # номер пункта меню, не забывать про шибку, если что-то неправильно
+        inp = int(input("Выберите пункт меню: "))
+        if inp > len(self.items) + 1 or inp < 1:
+            print('Вы ввели некорректный пункт меню!')
+        elif inp == len(self.items) + 1:
+            self.is_running = False
+        else:
+            self.items[inp - 1].run()
+
+            # for item in self.items:
+            #     if int(item[0]) == inp:
+            #         item.run()
 
 class SimpleMenuItem(MenuItem):
     action: Callable
@@ -51,3 +69,17 @@ class SimpleMenuItem(MenuItem):
 
     def run(self):
         self.action()
+    
+def test():
+    print('Hello, World!')
+
+main_menu = Menu('Главное меню')
+
+main_menu.add_SimpleMenuItem('Список студентов', test)
+main_menu.add_SimpleMenuItem('Добавить студента', test)
+student_editor = main_menu.add_SubMenu('Редактировать студента')
+main_menu.add_SimpleMenuItem('Удалить студента', test)
+main_menu.add_SimpleMenuItem('Показать отличников', test)
+main_menu.add_SimpleMenuItem('Показать неуспевающих', test)
+    
+main_menu.run()
