@@ -40,7 +40,10 @@ class Menu(MenuItem):
 
     def run(self):
         if self.on_start_command is not None:
-            self.on_start_command()
+            try:
+                self.on_start_command()
+            except Exception:
+                return
         self.is_running = True
         while self.is_running:
             if self.on_print_command is not None:

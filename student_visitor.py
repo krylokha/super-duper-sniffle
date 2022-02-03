@@ -6,69 +6,59 @@ import student as st
 from student_view import BriefStudentView, DetailedStudentView
 
 class StudentVisitor(Protocol):
-    def start_visit():
+    def start_visit(self):
         pass
     
-    def visit_student(index: int, s: st.Student):
+    def visit_student(self, index: int, s: st.Student):
         pass
     
-    def finish_visit():
+    def finish_visit(self):
         pass
     
 class BriefPrintVisitor(StudentVisitor):
-    @staticmethod
-    def start_visit():
+    def start_visit(self):
         pass
     
-    @staticmethod
-    def visit_student(index: int, s: st.Student):        
+    def visit_student(self, index: int, s: st.Student):        
         print(f'{index + 1}.', end = " ")
         BriefStudentView(s).view()
-    
-    @staticmethod    
-    def finish_visit():
+     
+    def finish_visit(self):
         pass
 
 class DetailedPrintVisitor(StudentVisitor):
-    @staticmethod
-    def start_visit():
+    def start_visit(self):
         pass
     
-    @staticmethod
-    def visit_student(index: int, s: st.Student):
+    def visit_student(self, index: int, s: st.Student):
         print(f'=== {index + 1} ===')
         DetailedStudentView(s).view()
         
-    @staticmethod
-    def finish_visit():
+    def finish_visit(self):
         pass
     
 class HighAchieverPrintVisitor(StudentVisitor):
-    @staticmethod
-    def start_visit():
-        pass
+    def __init__(self):
+        self.count = 0
     
-    @staticmethod
-    def visit_student(index: int, s: st.Student):
-        count = 0
-        for value in s.marks.values():
-            if value == 5:
-                count += 1
-            if count == len(s.marks):
-                return DetailedStudentView(s).view()
-        return print('Отличников нет')
+    def start_visit(self):
+        self.count = 0
     
-    @staticmethod
-    def finish_visit():
-        pass
+    def visit_student(self, index: int, s: st.Student):
+        if s.is_high_achiever():
+            DetailedStudentView(s).view()
+            self.count += 1
     
+    def finish_visit(self):
+        if self.count == 0:
+            print("Отличников нет")
+    
+# аналогично
 class LowAchieverPrintVisitor(StudentVisitor):
-    @staticmethod
-    def start_visit():
+    def start_visit(self):
         pass
     
-    @staticmethod
-    def visit_student(index: int, s: st.Student):
+    def visit_student(self, index: int, s: st.Student):
         count = 0
         for value in s.marks.values():
             if value < 3:
@@ -78,6 +68,5 @@ class LowAchieverPrintVisitor(StudentVisitor):
         if count == 0: 
             print('Неуспевающих нет')
     
-    @staticmethod
-    def finish_visit():
+    def finish_visit(self):
         pass

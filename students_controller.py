@@ -1,19 +1,38 @@
 from __future__ import annotations
-from calendar import c
 from menu import Menu
 from student import Student
 from student_view import BriefStudentView, DetailedStudentView
 from student_visitor import BriefPrintVisitor, DetailedPrintVisitor, HighAchieverPrintVisitor, LowAchieverPrintVisitor
 from students_repository import StudentRepository
+import json
 
 class StudentsController:
-    students: StudentRepository
-    main_menu: Menu
     
-    def __init__(self, students, main_menu):
-        self.students = students
-        self.main_menu = main_menu
+    def __init__(self):
+        self.students = StudentRepository()
+        self.students.load()
+        self.main_menu = Menu('Главное меню')
+        self.create_menu()
         self.selected_student = None
+    
+    def create_menu(self):
+        self.main_menu.add_SimpleMenuItem('Список студентов', self.list_students)
+        self.main_menu.add_SimpleMenuItem('Добавить студента', self.add_student)
+        student_editor = self.main_menu.add_SubMenu('Редактировать студента')
+        student_editor.add_SimpleMenuItem('Изменить фамилию', self.edit_last_name)
+        student_editor.add_SimpleMenuItem('Изменить имя', self.edit_first_name)
+        student_editor.add_SimpleMenuItem('Изменить отчество', self.edit_middle_name)
+        student_editor.add_SimpleMenuItem('Изменить группу', self.edit_group)
+        student_editor.add_SimpleMenuItem('Добавить оценку', self.add_mark)
+        student_editor.add_SimpleMenuItem('Изменить оценку', self.edit_mark)
+        student_editor.add_SimpleMenuItem('Удалить оценку', self.remove_mark)
+        self.main_menu.add_SimpleMenuItem('Удалить студента', self.remove_student)
+        self.main_menu.add_SimpleMenuItem('Показать неуспевающих', self.get_low_achievement_students)
+        self.main_menu.add_SimpleMenuItem('Показать отличников', self.get_high_achievement_students)
+        
+        student_editor.set_on_start_command(self.select_student)
+        student_editor.set_on_print_command(self.print_selected_student)
+        student_editor.set_on_exit_command(self.deselect_student)
         
     def list_students(self):
         self.students.visit(DetailedPrintVisitor())
@@ -38,7 +57,7 @@ class StudentsController:
     
     def get_high_achievement_students(self):
         for i in range(self.students.count_students()):
-            self.students.visit(HighAchieverPrintVisitor())
+            self.students.visit(HighAchieverPrintVisitor()) 
     
     def get_low_achievement_students(self):
         for i in range(self.students.count_students()):
@@ -46,15 +65,19 @@ class StudentsController:
         
     def edit_last_name(self):
         self.selected_student.last_name = str(input('Новая фамилия: '))
+        self.students.save()
         
     def edit_first_name(self):
-        self.selected_student.first_name = str(input('Новое имя: '))    
+        self.selected_student.first_name = str(input('Новое имя: '))  
+        self.students.save()  
         
     def edit_middle_name(self):
         self.selected_student.middle_name = str(input('Новое отчество: '))
+        self.students.save()
     
     def edit_group(self):
         self.selected_student.group = str(input('Новая группа: '))
+        self.students.save()
         
     def add_mark(self):
         subj = str(input('Предмет: '))
@@ -63,6 +86,7 @@ class StudentsController:
         else:
             mark = int(input('Оценка: '))
             self.selected_student.create_marks(subj, mark)
+            self.students.save()
         
     def edit_mark(self):
         subj = str(input('Предмет: '))
@@ -70,18 +94,24 @@ class StudentsController:
             print('У студента ещё нет этого предмета')
         else:
             mark = int(input('Оценка: '))
-            self.selected_student.marks[subj] = mark # по-другому изменение
+            self.selected_student.marks[subj] = mark
+            self.students.save()
             
     def remove_mark(self):
         subj = str(input('Предмет: '))
         confirm = str(input(f'Вы уверены, что хотите удалить оценку по {subj}? [Y/N] '))
         if confirm == 'Y':
             self.selected_student.marks.pop(subj)
+            self.students.save()
     
     def select_student(self):
         self.students.visit(BriefPrintVisitor())
         chosen_student = int(input('Выберите студента: '))
-        self.selected_student = self.students.get_student(chosen_student)
+        if not (1 <= chosen_student <= self.students.count_students()):
+            print('Выбран неправильный номер студента')
+            raise Exception()
+        else:
+            self.selected_student = self.students.get_student(chosen_student)
     
     def print_selected_student(self):
         print('Редактируемый студент: ')
@@ -91,39 +121,10 @@ class StudentsController:
         self.selected_student = None
     
     def run(self):
-        self.main_menu.run()     
+        self.main_menu.run()
 
-def main():
-    main_menu = Menu('Главное меню')
-    
-    ivanov = Student('Иванов', 'Иван', 'Иванович', 'ОП-16')
-    ivanov.create_marks('Математика', 5)
-    ivanov.create_marks('Информатика', 5)
-    petrov = Student('Петров', 'Петр', 'Петрович', 'ОП-16')
-    repository = StudentRepository()
-    repository.add_student(ivanov)
-    repository.add_student(petrov)
-    
-    controller = StudentsController(repository, main_menu)
-
-    main_menu.add_SimpleMenuItem('Список студентов', controller.list_students)
-    main_menu.add_SimpleMenuItem('Добавить студента', controller.add_student)
-    student_editor = main_menu.add_SubMenu('Редактировать студента')
-    student_editor.add_SimpleMenuItem('Изменить фамилию', controller.edit_last_name)
-    student_editor.add_SimpleMenuItem('Изменить имя', controller.edit_first_name)
-    student_editor.add_SimpleMenuItem('Изменить отчество', controller.edit_middle_name)
-    student_editor.add_SimpleMenuItem('Изменить группу', controller.edit_group)
-    student_editor.add_SimpleMenuItem('Добавить оценку', controller.add_mark)
-    student_editor.add_SimpleMenuItem('Изменить оценку', controller.edit_mark)
-    student_editor.add_SimpleMenuItem('Удалить оценку', controller.remove_mark)
-    main_menu.add_SimpleMenuItem('Удалить студента', controller.remove_student)
-    main_menu.add_SimpleMenuItem('Показать неуспевающих', controller.get_low_achievement_students)
-    main_menu.add_SimpleMenuItem('Показать отличников', controller.get_high_achievement_students)
-    
-    student_editor.set_on_start_command(controller.select_student)
-    student_editor.set_on_print_command(controller.print_selected_student)
-    student_editor.set_on_exit_command(controller.deselect_student)
-
+def main():        
+    controller = StudentsController()
     controller.run()
     
 if __name__ == "__main__":

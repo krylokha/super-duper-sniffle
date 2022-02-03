@@ -1,6 +1,8 @@
 from __future__ import annotations
 from student import Student
 from student_visitor import StudentVisitor
+from dataclasses import (asdict, dataclass)
+import json
 
 class StudentRepository:
     students: list[Student]
@@ -27,7 +29,15 @@ class StudentRepository:
         v.finish_visit()
             
     def save(self):
-        pass
+        result = []
+        for student in self.students:
+            result.append(asdict(student))
+        with open("students.json", "w", encoding="utf-8") as f:
+            json.dump(result, f)
     
     def load(self):
-        pass
+        self.students = []
+        with open("students.json", "r", encoding="utf-8") as f:
+            students_data = json.load(f)
+        for student in students_data:
+            self.students.append(Student(**student))
