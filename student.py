@@ -13,8 +13,19 @@ class Student:
         self.marks[subj] = mark
         
     def is_high_achiever(self) -> bool:
-        pass
+        flag = False
+        for mark in self.marks.values():
+            if mark == 5:
+                flag = True
+            else:
+                flag = False
+                break
+        return flag
     
     def is_low_achiever(self) -> bool:
-        pass
+        for mark in self.marks.values():
+            if mark < 3:
+                return True
+        return False
+            
     

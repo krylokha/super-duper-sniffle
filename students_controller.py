@@ -4,7 +4,6 @@ from student import Student
 from student_view import BriefStudentView, DetailedStudentView
 from student_visitor import BriefPrintVisitor, DetailedPrintVisitor, HighAchieverPrintVisitor, LowAchieverPrintVisitor
 from students_repository import StudentRepository
-import json
 
 class StudentsController:
     
@@ -56,12 +55,10 @@ class StudentsController:
                 self.students.remove_student(removing_student)
     
     def get_high_achievement_students(self):
-        for i in range(self.students.count_students()):
-            self.students.visit(HighAchieverPrintVisitor()) 
-    
+        self.students.visit(HighAchieverPrintVisitor()) 
+
     def get_low_achievement_students(self):
-        for i in range(self.students.count_students()):
-            self.students.visit(LowAchieverPrintVisitor())
+        self.students.visit(LowAchieverPrintVisitor())
         
     def edit_last_name(self):
         self.selected_student.last_name = str(input('Новая фамилия: '))
@@ -123,9 +120,7 @@ class StudentsController:
     def run(self):
         self.main_menu.run()
 
-def main():        
-    controller = StudentsController()
-    controller.run()
     
 if __name__ == "__main__":
-    main()
+    controller = StudentsController()
+    controller.run()

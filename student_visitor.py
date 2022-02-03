@@ -46,6 +46,7 @@ class HighAchieverPrintVisitor(StudentVisitor):
     
     def visit_student(self, index: int, s: st.Student):
         if s.is_high_achiever():
+            print(f"=== {self.count + 1} ===")
             DetailedStudentView(s).view()
             self.count += 1
     
@@ -55,18 +56,18 @@ class HighAchieverPrintVisitor(StudentVisitor):
     
 # аналогично
 class LowAchieverPrintVisitor(StudentVisitor):
+    def __init__(self):
+        self.count = 0
+    
     def start_visit(self):
-        pass
+        self.count = 0
     
     def visit_student(self, index: int, s: st.Student):
-        count = 0
-        for value in s.marks.values():
-            if value < 3:
-                count += 1
-                DetailedStudentView(s).view()
-                break
-        if count == 0: 
-            print('Неуспевающих нет')
+        if s.is_low_achiever():
+            print(f"=== {self.count + 1} ===")
+            DetailedStudentView(s).view()
+            self.count += 1
     
     def finish_visit(self):
-        pass
+        if self.count == 0:
+            print("Неуспевающих нет")
