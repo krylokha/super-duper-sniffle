@@ -1,5 +1,6 @@
 from __future__ import annotations
 from student import Student
+from student_visitor import StudentVisitor
 
 class StudentRepository:
     students: list[Student]
@@ -14,16 +15,19 @@ class StudentRepository:
         return self.students[index - 1]
     
     def remove_student(self, index: int):
-        # s = self.get_student(index - 1)
-        # self.students.remove(s)
-        del self.students[index -]
+        del self.students[index - 1]
         
     def count_students(self) -> int:
         return len(self.students)
-                
+            
+    def visit(self, v: StudentVisitor):
+        v.start_visit()
+        for i, student in enumerate (self.students):
+            v.visit_student(i, student)
+        v.finish_visit()
+            
     def save(self):
         pass
     
     def load(self):
         pass
-    

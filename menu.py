@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Callable, List
+from typing import Callable
 
 class MenuItem(ABC):
     title: str
@@ -25,12 +25,30 @@ class Menu(MenuItem):
         self.items = []
         self.is_running = False
         self.is_main_menu = is_main_menu
+        self.on_start_command = None
+        self.on_print_command = None
+        self.on_exit_command = None
+        
+    def set_on_start_command(self, command):
+        self.on_start_command = command
+        
+    def set_on_print_command(self, command):
+        self.on_print_command = command
+        
+    def set_on_exit_command(self, command):
+        self.on_exit_command = command
 
     def run(self):
+        if self.on_start_command is not None:
+            self.on_start_command()
         self.is_running = True
         while self.is_running:
+            if self.on_print_command is not None:
+                self.on_print_command()
             self.__print_menu()
             self.__handle_user_input()
+        if self.on_exit_command is not None:
+            self.on_exit_command()
 
     def add_SimpleMenuItem(self, item: MenuItem, action):
         simple_menu_item = SimpleMenuItem(item, action)
@@ -53,7 +71,7 @@ class Menu(MenuItem):
     def __handle_user_input(self):
         inp = int(input("Выберите пункт меню: "))
         if inp > len(self.items) + 1 or inp < 1:
-            print('Вы ввели некорректный пункт меню!')
+            print('Выбран некорректный пункт меню')
         elif inp == len(self.items) + 1:
             self.is_running = False
         else:
@@ -68,17 +86,3 @@ class SimpleMenuItem(MenuItem):
 
     def run(self):
         self.action()
-    
-def test():
-    print('Hello, World!')
-
-main_menu = Menu('Главное меню')
-
-main_menu.add_SimpleMenuItem('Список студентов', test)
-main_menu.add_SimpleMenuItem('Добавить студента', test)
-student_editor = main_menu.add_SubMenu('Редактировать студента')
-main_menu.add_SimpleMenuItem('Удалить студента', test)
-main_menu.add_SimpleMenuItem('Показать отличников', test)
-main_menu.add_SimpleMenuItem('Показать неуспевающих', test)
-    
-main_menu.run()
